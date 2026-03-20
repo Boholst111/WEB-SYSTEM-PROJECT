@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # Laravel Backend
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - APP_ENV=staging
+    container_name: diecast_app_staging
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+      - ./backend/storage:/var/www/storage
+    networks:
+      - diecast_network_staging
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - APP_ENV=staging
+      - DB_HOST=mysql
+      - DB_DATABASE=diecast_empire_staging
+      - DB_USERNAME=diecast_user
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: diecast_nginx_staging
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - ./backend:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d
+    networks:
+      - diecast_network_staging
+    depends_on:
+      - app
+
+  # MySQL Primary Database
+  mysql:
+    image: mysql:8.0
+    container_name: diecast_mysql_staging
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: diecast_empire_staging
+      MYSQL_USER: diecast_user
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_staging_data:/var/lib/mysql
+      - ./docker/mysql/conf.d/performance.cnf:/etc/mysql/conf.d/performance.cnf:ro
+    networks:
+      - diecast_network_staging
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: diecast_redis_staging
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_staging_data:/data
+    networks:
+      - diecast_network_staging
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_ENV=staging
+        - REACT_APP_API_URL=https://staging-api.diecastempire.com/api
+    container_name: diecast_frontend_staging
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    networks:
+      - diecast_network_staging
+
+volumes:
+  mysql_staging_data:
+  redis_staging_data:
+
+networks:
+  diecast_network_staging:
+    driver: bridge

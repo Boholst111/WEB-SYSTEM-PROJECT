@@ -1,0 +1,94 @@
+[mysqld]
+# MySQL Performance Optimization Configuration for Diecast Empire
+# Optimized for handling 100-500 concurrent users during Drop Day events
+
+# Connection Settings
+max_connections = 500
+max_connect_errors = 100
+connect_timeout = 10
+wait_timeout = 600
+interactive_timeout = 600
+
+# Thread and Connection Pool Settings
+thread_cache_size = 50
+thread_stack = 256K
+
+# Query Cache Settings (for read-heavy workloads)
+query_cache_type = 1
+query_cache_size = 64M
+query_cache_limit = 2M
+query_cache_min_res_unit = 2K
+
+# Buffer Pool Settings (InnoDB)
+innodb_buffer_pool_size = 1G
+innodb_buffer_pool_instances = 4
+innodb_log_buffer_size = 16M
+innodb_log_file_size = 256M
+
+# InnoDB Performance Settings
+innodb_flush_log_at_trx_commit = 2
+innodb_flush_method = O_DIRECT
+innodb_file_per_table = 1
+innodb_io_capacity = 2000
+innodb_io_capacity_max = 4000
+innodb_read_io_threads = 4
+innodb_write_io_threads = 4
+
+# Table and Index Settings
+table_open_cache = 4000
+table_definition_cache = 2000
+open_files_limit = 8000
+
+# Sort and Join Buffer Settings
+sort_buffer_size = 2M
+read_buffer_size = 1M
+read_rnd_buffer_size = 2M
+join_buffer_size = 2M
+
+# Temporary Table Settings
+tmp_table_size = 64M
+max_heap_table_size = 64M
+
+# MyISAM Settings (for temporary tables)
+key_buffer_size = 32M
+myisam_sort_buffer_size = 8M
+
+# Binary Log Settings (for replication)
+server_id = 1
+log_bin = /var/log/mysql/mysql-bin.log
+binlog_format = ROW
+binlog_expire_logs_seconds = 604800
+max_binlog_size = 100M
+sync_binlog = 1
+
+# Replication Settings
+relay_log = /var/log/mysql/mysql-relay-bin
+relay_log_recovery = 1
+read_only = 0
+
+# Slow Query Log (for monitoring)
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/slow-query.log
+long_query_time = 2
+log_queries_not_using_indexes = 1
+
+# General Log (disable in production)
+general_log = 0
+general_log_file = /var/log/mysql/general.log
+
+# Character Set
+character_set_server = utf8mb4
+collation_server = utf8mb4_unicode_ci
+
+# Performance Schema (for monitoring)
+performance_schema = ON
+performance_schema_max_table_instances = 12500
+performance_schema_max_table_handles = 4000
+
+# Security Settings
+local_infile = 0
+symbolic_links = 0
+
+# Optimizer Settings
+optimizer_search_depth = 5
+optimizer_switch = 'index_merge=on,index_merge_union=on,index_merge_sort_union=on,index_merge_intersection=on'

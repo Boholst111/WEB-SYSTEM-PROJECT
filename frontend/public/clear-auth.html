@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Authentication - Diecast Empire</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .success {
+            display: none;
+            color: #10b981;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .info {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .info strong {
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Clear Authentication</h1>
+        <p>Your authentication token needs to be refreshed to include your admin role.</p>
+        
+        <div class="info">
+            <strong>Why?</strong><br>
+            Your current session was created before the admin role was added to your account. 
+            Clearing the token will allow you to log in again with the updated permissions.
+        </div>
+
+        <button onclick="clearAuth()">Clear Auth Token & Redirect to Login</button>
+        
+        <div class="success" id="success">
+            ✅ Token cleared! Redirecting to login...
+        </div>
+    </div>
+
+    <script>
+        function clearAuth() {
+            // Clear the auth token
+            localStorage.removeItem('auth_token');
+            
+            // Clear any other auth-related data
+            localStorage.removeItem('user');
+            sessionStorage.clear();
+            
+            // Show success message
+            document.getElementById('success').style.display = 'block';
+            
+            // Redirect to login after 1.5 seconds
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
