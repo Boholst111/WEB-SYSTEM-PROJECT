@@ -42,6 +42,14 @@ jobs:
         working-directory: ./backend
         run: composer install --prefer-dist --no-progress --no-suggest
 
+      - name: Setup Laravel directories
+        working-directory: ./backend
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/{sessions,views,cache}
+          mkdir -p storage/logs
+          chmod -R 777 storage bootstrap/cache
+
       - name: Copy environment file
         working-directory: ./backend
         run: cp .env.example .env
